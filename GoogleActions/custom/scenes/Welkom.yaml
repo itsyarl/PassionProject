@@ -1,0 +1,9 @@
+intentEvents:
+- intent: hoeGaatHet
+onEnter:
+  staticPrompt:
+    candidates:
+    - promptResponse:
+        firstSimple:
+          variants:
+          - speech: Zeg het maar.
