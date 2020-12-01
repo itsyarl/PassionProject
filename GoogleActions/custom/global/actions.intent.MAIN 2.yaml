@@ -1,9 +1,0 @@
-handler:
-  staticPrompt:
-    candidates:
-    - promptResponse:
-        firstSimple:
-          variants:
-          - speech: Hallo, ik ben jouw bloempot!
-            text: Hallo, ik ben jouw bloempot!
-transitionToScene: Start
