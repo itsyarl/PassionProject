@@ -1,7 +1,7 @@
 {
-  "name": "dialogflow-webhook-boilerplate-nodejs",
+  "name": "bloempot",
   "version": "1.0.0",
-  "description": "Self hosted Webhook Boilerplate (using Dialogflow) in Node.js",
+  "description": "Smartbloempot?",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -17,8 +17,13 @@
   },
   "homepage": "https://github.com/anudeepreddy/dialogflow-webhook-boilerplate-nodejs#readme",
   "dependencies": {
-    "actions-on-google": "^2.7.1",
+    "actions-on-google": "^2.13.0",
     "body-parser": "^1.19.0",
-    "express": "^4.17.1"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "faunadb": "^3.0.1",
+    "node-fetch": "^2.6.1",
+    "oauth": "^0.9.15",
+    "twit": "^2.2.11"
   }
 }
