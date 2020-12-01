@@ -184,7 +184,6 @@ app.catch((conv, e) => {
 });
 
 const expressApp = express().use(bodyParser.json());
-expressApp.post('/webhook' ,app);
 
 expressApp.listen(3000);
 
