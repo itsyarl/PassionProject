@@ -9,7 +9,7 @@ const fetch = require("node-fetch");
 const faunadb = require('faunadb'),
 q = faunadb.query;
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 const {dialogflow, input, option, List, Permission} = require('actions-on-google');
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -184,7 +184,8 @@ app.catch((conv, e) => {
 });
 
 const expressApp = express().use(bodyParser.json());
+expressApp.post('/webhook', app);
 
-expressApp.listen(3000);
+expressApp.listen(8080);
 
 //©, 2020, Yarl Van onckelen
