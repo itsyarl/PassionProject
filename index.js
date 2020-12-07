@@ -4,12 +4,10 @@ const Twit = require("twit");
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require("node-fetch");
 
 const faunadb = require('faunadb'),
 q = faunadb.query;
 
-const port = process.env.PORT || 8080;
 
 const {dialogflow, input, option, List, Permission} = require('actions-on-google');
 const CLIENT_ID = process.env.CLIENT_ID;
