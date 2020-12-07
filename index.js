@@ -224,6 +224,10 @@ app.catch((conv, e) => {
 const expressApp = express().use(bodyParser.json());
 expressApp.post('/webhook', app);
 
+expressApp.get('/getName',function (req,res){
+    res.send('Swarup Bam');
+});
+
 expressApp.listen(8080);
 
 //©, 2020, Yarl Van onckelen
