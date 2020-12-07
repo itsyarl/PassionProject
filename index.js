@@ -1,5 +1,3 @@
-'use strict';
-
 const Twit = require("twit");
 require('dotenv').config();
 const express = require('express');
@@ -221,13 +219,14 @@ app.catch((conv, e) => {
     conv.close('Er ging iets mis sorry.');
 });
 
-const expressApp = express().use(bodyParser.json());
+const expressApp = express();
+expressApp.use(bodyParser.json());
 expressApp.post('/webhook', app);
 
 expressApp.get('/getName',function (req,res){
     res.send('Swarup Bam');
 });
 
-expressApp.listen(8080);
+expressApp.listen(3000);
 
 //©, 2020, Yarl Van onckelen
