@@ -3,13 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const faunadb = require('faunadb'),
-q = faunadb.query;
-
-
 const {dialogflow, input, option, List, Permission} = require('actions-on-google');
 const CLIENT_ID = process.env.CLIENT_ID;
 const app = dialogflow({debug:true, clientId: CLIENT_ID});
+
+const faunadb = require('faunadb'),
+q = faunadb.query;
 
 var adminClient = new faunadb.Client({ secret: process.env.ADMIN_SECRET });
 var serverClient = new faunadb.Client({ secret: process.env.SERVER_SECRET });
@@ -19,6 +18,15 @@ const T = new Twit({
     consumer_secret: process.env.TWITTER_SECRET,
     access_token: process.env.TWITTER_TOKEN,
     access_token_secret: process.env.TWITTER_SECRET_TOKEN,
+});
+
+const port = process.env.PORT || 3000;
+const expressApp = express();
+expressApp.use(bodyParser.json());
+expressApp.post('/webhook', app);
+
+expressApp.listen(port, () => {
+    console.log(`Listening on port ${port}`);
 });
 
 app.intent('get_stop', async conv => {
@@ -218,15 +226,5 @@ app.catch((conv, e) => {
     console.error(e);  
     conv.close('Er ging iets mis sorry.');
 });
-
-const expressApp = express();
-expressApp.use(bodyParser.json());
-expressApp.post('/webhook', app);
-
-expressApp.get('/getName',function (req,res){
-    res.send('Swarup Bam');
-});
-
-expressApp.listen(3000);
 
 //©, 2020, Yarl Van onckelen
