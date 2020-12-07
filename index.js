@@ -18,6 +18,13 @@ const app = dialogflow({debug:true, clientId: CLIENT_ID});
 var adminClient = new faunadb.Client({ secret: process.env.ADMIN_SECRET });
 var serverClient = new faunadb.Client({ secret: process.env.SERVER_SECRET });
 
+const T = new Twit({
+    consumer_key: process.env.TWITTER_KEY,
+    consumer_secret: process.env.TWITTER_SECRET,
+    access_token: process.env.TWITTER_TOKEN,
+    access_token_secret: process.env.TWITTER_SECRET_TOKEN,
+});
+
 app.intent('get_stop', async conv => {
     const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
     const name = pot.data.u;
@@ -126,23 +133,63 @@ app.intent('get_status_zon', async (conv) => {
 })
 
 app.intent('get_status_hoeGaatHet', async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const zon = pot.data.zo;
-    const water = pot.data.w;
+    let today = new Date();
+    let day = ("0" + today.getDate()).slice(-2);
+    let month = ("0" + (today.getMonth()+1)).slice(-2);
+    let year = today.getFullYear();
+    let date = `${day}/${month}/${year}`;
+
+    const allData = await serverClient.query(
+        q.Call(q.Function("averageOfDay"), date)
+    );
+
+    console.log(allData);
+
+    const allWater = allData.data.map(data => {
+        return data[0]
+    });
+
+    const allZuurstof = allData.data.map(data => {
+        return data[1]
+    });
+
+    const allZon = allData.data.map(data => {
+        return data[2]
+    });
+
+    let totalWater = 0;
+    let totalZon = 0;
+    let totalZuurstof = 0;
+
+    for(var i = 0; i < allWater.length; i++) {
+        totalWater += allWater[i];
+    }
+
+    for(var i = 0; i < allZuurstof.length; i++) {
+        totalZuurstof += allZuurstof[i];
+    }
+
+    for(var i = 0; i < allZon.length; i++) {
+        totalZon += allZon[i];
+    }
+
+    const zon = totalZon / allZon.length;
+    const water = totalWater / allWater.length;
+    const zuurstof = totalZuurstof / allZuurstof.length;
     
-    if (zon >= 80 && water >= 80) {
+    if (zon >= 4.4 &5& water >= 50 && zuurstof >= 40) {
         conv.ask("Het is een mooie dag. Ik heb heel veel zon gekregen. Dit was zalig warm! Ik heb ook echt niet veel dorst. Ik hoop dat jouw dag ook zo mooi was.");
-    } else if (zon >= 80 && water >= 50) {
+    } else if (zon >= 4.4 && water >= 40 && zuurstof >= 40) {
         conv.ask("De zon voelt fantastisch vandaag. Alleen begin ik wel al een beetje dorst te krijgen.");
-    } else if (zon >= 80 && water < 50) {
+    } else if (zon >= 4.4 && water < 30 && zuurstof >= 40) {
         conv.ask("Het weer was prachtig vandaag, lekker veel zon. Maar kan je mij water geven? Ik heb echt veel dorst.");
-    } else if (zon >= 50 && water >= 80) {
+    } else if (zon >= 3 && water >= 50 && zuurstof >= 40) {
         conv.ask("De zon was wel een beetje verstopt denk ik. Die heb ik gemist vandaag. Verder heb ik nog genoeg gedronken en is alles in orde!");
-    } else if (zon <= 50 && water >= 80) {
+    } else if (zon <= 3 && water >= 50 && zuurstof >= 40) {
         conv.ask("Er was heel weinig zon vandaag, had het erg koud. Gelukkig had ik genoeg eten zodat ik toch nog kon verder groeien!");
-    } else if (zon >= 50 && water >= 50) {
+    } else if (zon >= 2 && water >= 40 && zuurstof >= 40) {
         conv.ask("Wat een sombere dag, ik heb niet echt veel zon gekregen en begin toch wel dorst te krijgen.");
-    } else if (zon <= 50 && water <= 50) {
+    } else if (zon <= 2 && water <= 30 && zuurstof >= 40) {
         conv.ask("vandaag was echt een rotdag! Heel weinig zon en ik sterf bijna van de dorst!");
     } else {
         conv.ask("ik weet het niet zo goed, ik ben een beetje verward.");
@@ -165,13 +212,6 @@ app.intent('get_status_zuurstof', async (conv) => {
 })
 
 app.intent('get_twitter', async (conv) => {
-    const T = new Twit({
-        consumer_key: process.env.TWITTER_KEY,
-        consumer_secret: process.env.TWITTER_SECRET,
-        access_token: process.env.TWITTER_TOKEN,
-        access_token_secret: process.env.TWITTER_SECRET_TOKEN,
-    });
-
     const tweetData = await T.get('statuses/user_timeline', { q: 'user: @TheRealCharel', count: 1 });
 
     console.log(tweetData.data[0].text);
