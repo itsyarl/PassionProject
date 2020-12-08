@@ -109,10 +109,10 @@ app.intent('get_status_water', async (conv) => {
     const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
     const water = pot.data.w;
 
-    if (water > 80){
+    if (water >= 50){
         console.log("water is perfect");
         conv.ask("water is perfect, ik voel me goed");
-    }else if (water > 50){
+    }else if (water >= 40){
         console.log("water oké");
         conv.ask("mijn water is oké, een vier-uurtje mag er wel bijna aankomen");
     }else{
@@ -124,15 +124,30 @@ app.intent('get_status_water', async (conv) => {
 app.intent('get_status_zon', async (conv) => {
     const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
     const zon = pot.data.zo;
-    if (zon > 60){
+    if (zon >= 4.4){
         console.log("De zon is geweldig");
         conv.ask("Wat is de zon weer goed vandaag");
-    }else if (zon > 50){
+    }else if (zon >= 3){
         console.log("zon oké");
         conv.ask("Er is weinig zon, of sta ik verkeerd");
     }else{
         console.log("te weinig zon");
         conv.ask("Ik krijg echt te weinig zon, zo ga ik nooit groot worden.");
+    } 
+})
+
+app.intent('get_status_zuurstof', async (conv) => {
+    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
+    const zuurstof = pot.data.zu;
+    if (zuurstof >= 40){
+        console.log("De zuurstof is geweldig");
+        conv.ask("Fisse lucht is toch geweldig he? Gelukkig is hier genoeg!");
+    }else if (zuurstof < 40){
+        console.log("zuurstof oké");
+        conv.ask("Zou ik als het mooi weer is nog eens buiten mogen, het is hier nogal benauwd.");
+    }else{
+        console.log("te weinig zuurstof");
+        conv.ask("Ik stik bijna, ik heb veel meer zuurstof nodig.");
     } 
 })
 
@@ -181,7 +196,7 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     const water = totalWater / allWater.length;
     const zuurstof = totalZuurstof / allZuurstof.length;
     
-    if (zon >= 4.4 &5& water >= 50 && zuurstof >= 40) {
+    if (zon >= 4.4 && water >= 50 && zuurstof >= 40) {
         conv.ask("Het is een mooie dag. Ik heb heel veel zon gekregen. Dit was zalig warm! Ik heb ook echt niet veel dorst. Ik hoop dat jouw dag ook zo mooi was.");
     } else if (zon >= 4.4 && water >= 40 && zuurstof >= 40) {
         conv.ask("De zon voelt fantastisch vandaag. Alleen begin ik wel al een beetje dorst te krijgen.");
@@ -198,21 +213,6 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     } else {
         conv.ask("ik weet het niet zo goed, ik ben een beetje verward.");
     }
-})
-
-app.intent('get_status_zuurstof', async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const zuurstof = pot.data.zu;
-    if (zuurstof > 60){
-        console.log("De zuurstof is geweldig");
-        conv.ask("Fisse lucht is toch geweldig he? Gelukkig is hier genoeg!");
-    }else if (zuurstof > 50){
-        console.log("zuurstof oké");
-        conv.ask("Zou ik als het mooi weer is nog eens buiten mogen, het is hier nogal benauwd.");
-    }else{
-        console.log("te weinig zuurstof");
-        conv.ask("Ik stik bijna, ik heb veel meer zuurstof nodig.");
-    } 
 })
 
 app.intent('get_twitter', async (conv) => {
