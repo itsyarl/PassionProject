@@ -48,7 +48,7 @@ app.intent('get_stop', async conv => {
 
 app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) => { 
     const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser')))).length;
-    console.log(user.data.length);
+    console.log(user);
     if (user === 0) {
         try {
             const permissions = ['NAME'];
