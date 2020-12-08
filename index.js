@@ -82,9 +82,9 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
         console.error(err);
         }
         
-    // } else {
-    //     await hello(conv)
-    // }
+    } else {
+        await hello(conv)
+    }
 }); 
 
 const hello = async (conv) => {
