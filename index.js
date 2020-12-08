@@ -20,6 +20,12 @@ const T = new Twit({
     access_token_secret: process.env.TWITTER_SECRET_TOKEN,
 });
 
+let today = new Date();
+let day = ("0" + today.getDate()).slice(-2);
+let month = ("0" + (today.getMonth()+1)).slice(-2);
+let year = today.getFullYear();
+let date = `${day}/${month}/${year}`;
+
 const port = process.env.PORT || 3000;
 const expressApp = express();
 expressApp.use(bodyParser.json());
@@ -30,8 +36,8 @@ expressApp.listen(port, () => {
 });
 
 app.intent('get_stop', async conv => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const name = pot.data.u;
+    const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
+    const name = user.data;
     if (name === undefined){
         conv.close('Tot de volgende keer');
     } else {
@@ -41,26 +47,27 @@ app.intent('get_stop', async conv => {
 
 
 app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) => { 
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    if (pot.data.u === undefined) {
+    const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
+    console.log(user.data.length);
+    if (user.data.length === 0) {
         try {
             const permissions = ['NAME'];
             let context = 'om je aan te spreken met je naam.';
             const {name} = conv.user;
-            console.log(conv.parameters['PERMISSION']);
-            if (name.display) {
+
+            if (conv.parameters["PERMISSiON"] === true) {
                 conv.ask(`Is het correct dat ik je aanspreek met ${name.given}`);
                 serverClient.query(
-                    q.Update(
-                        q.Ref(q.Collection('Pot'), '281716958491050503'),
+                    q.Create(
+                        q.Collection('Pot'),
                         { data: { u: name.given } }
                     )
                 )
             } else if (conv.parameters["PERMISSiON"] === false){
                 conv.ask(`Is het correct dat ik je aanspreek met daddy`);
                 serverClient.query(
-                    q.Update(
-                        q.Ref(q.Collection('Pot'), '281716958491050503'),
+                    q.Create(
+                        q.Collection('Pot'),
                         { data: { u: "daddy" } }
                     )
                 )
@@ -74,15 +81,15 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
         } catch (err) {
         console.error(err);
         }
-    } else {
-        await hello(conv)
-    }
+        
+    // } else {
+    //     await hello(conv)
+    // }
 }); 
 
 const hello = async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    console.log(pot.data.u)
-    conv.ask(`Hallo ${pot.data.u}, ik ben jouw bloempot.`);
+    const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
+    conv.ask(`Hallo ${user.data}, ik ben jouw bloempot.`);
     conv.ask('Laten we praten!');
 }
 
@@ -99,15 +106,16 @@ app.intent('Default Welcome Intent - name', conv => {
     conv.ask("Dan noem ik je " + givenName);
     serverClient.query(
         q.Update(
-            q.Ref(q.Collection('Pot'), '281716958491050503'),
+            q.Ref(q.Collection('Pot'), '284351533403865601'),
             { data: { u: givenName } }
         )
     )
 })
 
 app.intent('get_status_water', async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const water = pot.data.w;
+    const pot = await serverClient.query(q.Paginate(q.Match(q.Index('getWater'), date)));
+    const water = pot.data[0];
+    console.log(water);
 
     if (water >= 50){
         console.log("water is perfect");
@@ -122,8 +130,12 @@ app.intent('get_status_water', async (conv) => {
 })
 
 app.intent('get_status_zon', async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const zon = pot.data.zo;
+    const allZon = await serverClient.query(q.Paginate(q.Match(q.Index('getSun'), date)));
+    let totalZon = 0;
+    for(var i = 0; i < allZon.data.length; i++) {
+        totalZon += allZon.data[i];
+    }
+    const zon = totalZon / allZon.data.length;
     if (zon >= 4.4){
         console.log("De zon is geweldig");
         conv.ask("Wat is de zon weer goed vandaag");
@@ -137,8 +149,13 @@ app.intent('get_status_zon', async (conv) => {
 })
 
 app.intent('get_status_zuurstof', async (conv) => {
-    const pot = await serverClient.query(q.Get(q.Ref(q.Collection('Pot'), '281716958491050503')));
-    const zuurstof = pot.data.zu;
+    const allAir =  await serverClient.query(q.Paginate(q.Match(q.Index('getAir'), date)));
+    let totalAir = 0;
+    for(var i = 0; i < allAir.data.length; i++) {
+        totalAir += allAir.data[i];
+    }
+    const zuurstof = totalAir / allAir.data.length;
+    console.log(zuurstof);
     if (zuurstof >= 40){
         console.log("De zuurstof is geweldig");
         conv.ask("Fisse lucht is toch geweldig he? Gelukkig is hier genoeg!");
@@ -152,12 +169,6 @@ app.intent('get_status_zuurstof', async (conv) => {
 })
 
 app.intent('get_status_hoeGaatHet', async (conv) => {
-    let today = new Date();
-    let day = ("0" + today.getDate()).slice(-2);
-    let month = ("0" + (today.getMonth()+1)).slice(-2);
-    let year = today.getFullYear();
-    let date = `${day}/${month}/${year}`;
-
     const allData = await serverClient.query(
         q.Call(q.Function("averageOfDay"), date)
     );
