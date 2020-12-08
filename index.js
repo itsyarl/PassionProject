@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {dialogflow, input, option, List, Permission} = require('actions-on-google');
+const {dialogflow, Permission} = require('actions-on-google');
 const CLIENT_ID = process.env.CLIENT_ID;
 const app = dialogflow({debug:true, clientId: CLIENT_ID});
 
@@ -26,7 +26,7 @@ let month = ("0" + (today.getMonth()+1)).slice(-2);
 let year = today.getFullYear();
 let date = `${day}/${month}/${year}`;
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const expressApp = express();
 expressApp.use(bodyParser.json());
 expressApp.post('/webhook', app);
@@ -37,8 +37,8 @@ expressApp.listen(port, () => {
 
 app.intent('get_stop', async conv => {
     const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
-    const name = user.data;
-    if (name === undefined){
+    const name = user.data[0];
+    if (name.length === 0){
         conv.close('Tot de volgende keer');
     } else {
         conv.close(`Tot de volgende keer ${name}`);
@@ -47,15 +47,15 @@ app.intent('get_stop', async conv => {
 
 
 app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) => { 
-    const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser')))).length;
-    console.log(user);
-    if (user === 0) {
+    const pot = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
+    console.log(pot.data);
+    if (pot.data.length === 0) {
         try {
             const permissions = ['NAME'];
             let context = 'om je aan te spreken met je naam.';
             const {name} = conv.user;
-
-            if (conv.parameters["PERMISSiON"] === true) {
+            console.log(conv.parameters['PERMISSION']);
+            if (name.display) {
                 conv.ask(`Is het correct dat ik je aanspreek met ${name.given}`);
                 serverClient.query(
                     q.Create(
@@ -81,15 +81,14 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
         } catch (err) {
         console.error(err);
         }
-        
     } else {
         await hello(conv)
     }
 }); 
 
 const hello = async (conv) => {
-    const user = await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
-    conv.ask(`Hallo ${user.data}, ik ben jouw bloempot.`);
+    const pot = await await serverClient.query(q.Paginate(q.Match(q.Index('getUser'))));
+    conv.ask(`Hallo ${pot.data[0]}, ik ben jouw bloempot.`);
     conv.ask('Laten we praten!');
 }
 
@@ -105,8 +104,8 @@ app.intent('Default Welcome Intent - name', conv => {
     const givenName =  conv.parameters['given-name'];
     conv.ask("Dan noem ik je " + givenName);
     serverClient.query(
-        q.Update(
-            q.Ref(q.Collection('Pot'), '284351533403865601'),
+        q.Create(
+            q.Collection('Pot'),
             { data: { u: givenName } }
         )
     )
