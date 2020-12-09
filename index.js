@@ -205,6 +205,10 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     const zon = totalZon / allZon.length;
     const water = totalWater / allWater.length;
     const zuurstof = totalZuurstof / allZuurstof.length;
+
+    console.log(zon);
+    console.log(water);
+    console.log(zuurstof);
     
     if (zon >= 4.4 && water >= 50 && zuurstof >= 40) {
         conv.ask("Het is een mooie dag. Ik heb heel veel zon gekregen. Dit was zalig warm! Ik heb ook echt niet veel dorst. Ik hoop dat jouw dag ook zo mooi was.");
