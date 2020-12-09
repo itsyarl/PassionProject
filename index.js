@@ -218,21 +218,21 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     console.log(water);
     console.log(zuurstof);
     
-    if (zon >= 4 && water >= 50 && zuurstof >= 40) {
+    if (zon >= 4.3 && water >= 50 && zuurstof >= 40) {
         conv.ask("Het is een mooie dag. Ik heb heel veel zon gekregen. Dit was zalig warm! Ik heb ook echt niet veel dorst. Ik hoop dat jouw dag ook zo mooi was.");
-    } else if (zon >= 4 && water >= 40 && zuurstof >= 40) {
+    } else if (zon >= 4.3 && water >= 40 && zuurstof >= 40) {
         conv.ask("De zon voelt fantastisch vandaag. Alleen begin ik wel al een beetje dorst te krijgen.");
     } else if (zon >= 3 && water >= 40 && zuurstof >= 40) {
         conv.ask("De zon was wel een beetje verstopt denk ik. Ik mis ze wel een beetje. Ik begin ook wel al een beetje dorst te krijgen.");
-    } else if (zon >= 4 && water < 30 && zuurstof >= 40) {
+    } else if (zon >= 4.3 && water < 30 && zuurstof >= 40) {
         conv.ask("Het weer was prachtig vandaag, lekker veel zon. Maar kan je mij water geven? Ik heb echt veel dorst.");
     } else if (zon >= 3 && water >= 50 && zuurstof >= 40) {
         conv.ask("De zon was wel een beetje verstopt denk ik. Die heb ik gemist vandaag. Verder heb ik nog genoeg gedronken en is alles in orde!");
     } else if (zon <= 3 && water >= 50 && zuurstof >= 40) {
         conv.ask("Er was heel weinig zon vandaag, had het erg koud. Gelukkig had ik genoeg eten zodat ik toch nog kon verder groeien!");
-    } else if (zon >= 2 && water >= 40 && zuurstof >= 40) {
+    } else if (zon >= 2.5 && water >= 40 && zuurstof >= 40) {
         conv.ask("Wat een sombere dag, ik heb niet echt veel zon gekregen en begin toch wel dorst te krijgen.");
-    } else if (zon <= 2 && water <= 30 && zuurstof >= 40) {
+    } else if (zon <= 2.5 && water <= 30 && zuurstof >= 40) {
         conv.ask("vandaag was echt een rotdag! Heel weinig zon en ik sterf bijna van de dorst!");
     } else {
         conv.ask("ik weet het niet zo goed, ik ben een beetje verward.");
