@@ -29,6 +29,7 @@
     "faunadb": "^3.0.1",
     "node-fetch": "^2.6.1",
     "oauth": "^0.9.15",
+    "redditor": "^1.1.1",
     "twit": "^2.2.11"
   },
   "devDependencies": {

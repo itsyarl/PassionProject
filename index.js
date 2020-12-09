@@ -3,15 +3,17 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {dialogflow, Permission} = require('actions-on-google');
+const {dialogflow, Permission, GetJoke} = require('actions-on-google');
 const CLIENT_ID = process.env.CLIENT_ID;
 const app = dialogflow({debug:true, clientId: CLIENT_ID});
 
 const faunadb = require('faunadb'),
 q = faunadb.query;
 
-var adminClient = new faunadb.Client({ secret: process.env.ADMIN_SECRET });
-var serverClient = new faunadb.Client({ secret: process.env.SERVER_SECRET });
+let adminClient = new faunadb.Client({ secret: process.env.ADMIN_SECRET });
+let serverClient = new faunadb.Client({ secret: process.env.SERVER_SECRET });
+
+let reddit = require('redditor');
 
 const T = new Twit({
     consumer_key: process.env.TWITTER_KEY,
@@ -19,6 +21,11 @@ const T = new Twit({
     access_token: process.env.TWITTER_TOKEN,
     access_token_secret: process.env.TWITTER_SECRET_TOKEN,
 });
+
+// const R = reddit({
+//     username: process.env.REDDIT_USER,
+//     password: process.env.REDDIT_PASS
+// })
 
 let today = new Date();
 let day = ("0" + today.getDate()).slice(-2);
@@ -206,14 +213,6 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     const water = totalWater / allWater.length;
     const zuurstof = totalZuurstof / allZuurstof.length;
 
-// 2020-12-09T08:41:30.101209+00:00 app[web.1]: { data: [ [ 49.14, 43.89, 4.3 ] ] }
-
-// 2020-12-09T08:41:30.101362+00:00 app[web.1]: 4.3
-
-// 2020-12-09T08:41:30.101439+00:00 app[web.1]: 49.14
-
-// 2020-12-09T08:41:30.101499+00:00 app[web.1]: 43.89
-
     console.log(zon);
     console.log(water);
     console.log(zuurstof);
@@ -223,7 +222,7 @@ app.intent('get_status_hoeGaatHet', async (conv) => {
     } else if (zon >= 4.4 && water >= 40 && zuurstof >= 40) {
         conv.ask("De zon voelt fantastisch vandaag. Alleen begin ik wel al een beetje dorst te krijgen.");
     } else if (zon >= 3 && water >= 40 && zuurstof >= 40) {
-        conv.ask("De zon was wel een beetje verstopt denk ik. Ik mis ze wel een beetje. Ik begin ook wel al een beetje dorst te krijgen.");
+        conv.ask("De zon is wel een beetje verstopt denk ik. Ik mis ze wel een beetje. Ik begin ook wel al een beetje dorst te krijgen.");
     } else if (zon >= 4.4 && water < 30 && zuurstof >= 40) {
         conv.ask("Het weer was prachtig vandaag, lekker veel zon. Maar kan je mij water geven? Ik heb echt veel dorst.");
     } else if (zon >= 3 && water >= 50 && zuurstof >= 40) {
@@ -245,6 +244,21 @@ app.intent('get_twitter', async (conv) => {
     console.log(tweetData.data[0].text);
     conv.ask("Dit is mijn laatste tweet: " + tweetData.data[0].text);
 })
+
+reddit.get('/r/moppen.json', (err, response) => {
+    if(err) throw err;
+    app.intent('get_joke', (conv) => {
+        const moppenTeksten = response.data.children.map(data => {
+            return {tekst: data.data.selftext, titel: data.data.title}
+        })
+        const moppenTekst = moppenTeksten[Math.floor(Math.random() * moppenTeksten.length)]; 
+        console.log(moppenTekst.titel + moppenTekst.tekst);
+        conv.ask("Hier heb je een leuke mop:" + moppenTekst.titel);
+        conv.ask(moppenTekst.tekst);
+    })
+});
+
+
 
 app.catch((conv, e) => {  
     console.error(e);  
