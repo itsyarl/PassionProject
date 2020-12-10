@@ -22,11 +22,6 @@ const T = new Twit({
     access_token_secret: process.env.TWITTER_SECRET_TOKEN,
 });
 
-// const R = reddit({
-//     username: process.env.REDDIT_USER,
-//     password: process.env.REDDIT_PASS
-// })
-
 let today = new Date();
 let day = ("0" + today.getDate()).slice(-2);
 let month = ("0" + (today.getMonth()+1)).slice(-2);
@@ -64,13 +59,7 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
             console.log(conv.parameters['PERMISSION']);
             if (name.display) {
                 conv.ask(`Is het correct dat ik je aanspreek met ${name.given}`);
-                serverClient.query(
-                    q.Create(
-                        q.Collection('Pot'),
-                        { data: { u: name.given } }
-                    )
-                )
-            } else if (conv.parameters["PERMISSiON"] === false){
+            } else if (conv.parameters["PERMISSION"] === false){
                 conv.ask(`Is het correct dat ik je aanspreek met daddy`);
                 serverClient.query(
                     q.Create(
@@ -100,6 +89,12 @@ const hello = async (conv) => {
 }
 
 app.intent('Default Welcome Intent - yes', async conv => {
+    serverClient.query(
+        q.Create(
+            q.Collection('Pot'),
+            { data: { u: name.given } }
+        )
+    )
     await hello(conv);
 })
 
