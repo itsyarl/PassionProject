@@ -258,7 +258,11 @@ reddit.get('/r/moppen.json', (err, response) => {
     })
 });
 
-
+app.intent('hoe_water', conv => {
+    const antwoorden = ["De soep was waterachtig", "brrrrrrrrrrrp, het was heel lekker"]
+    const antwoord = antwoorden[Math.floor(Math.random() * antwoorden.length())];
+    conv.ask(antwoord);
+})
 
 app.catch((conv, e) => {  
     console.error(e);  
