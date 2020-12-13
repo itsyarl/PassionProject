@@ -121,9 +121,9 @@ app.intent('get_status_water', async (conv) => {
     if (water >= 50){
         console.log("water is perfect");
         conv.ask("water is perfect, ik voel me goed");
-    }else if (water >= 40){
+    }else if (water >= 38){
         console.log("water oké");
-        conv.ask("mijn water is oké, een vier-uurtje mag er wel bijna aankomen");
+        conv.ask("mijn water is oké, een vier-uurtje mag er wel aankomen");
     }else{
         console.log("Geef mij water!!!");
         conv.ask("Geef mij water aub, ik lig op sterven");
