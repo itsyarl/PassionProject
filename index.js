@@ -65,14 +65,6 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
                         { data: { u: name.given } }
                     )
                 )
-            } else if (conv.parameters["PERMISSION"] === false){
-                conv.ask(`Is het correct dat ik je aanspreek met daddy`);
-                serverClient.query(
-                    q.Create(
-                        q.Collection('Pot'),
-                        { data: { u: "daddy" } }
-                    )
-                )
             } else {
                 const options = {
                     context,
@@ -95,12 +87,6 @@ const hello = async (conv) => {
 }
 
 app.intent('Default Welcome Intent - yes', async conv => {
-    serverClient.query(
-        q.Create(
-            q.Collection('Pot'),
-            { data: { u: name.given } }
-        )
-    )
     await hello(conv);
 })
 
@@ -111,10 +97,15 @@ app.intent('Default Welcome Intent - no', conv => {
 app.intent('Default Welcome Intent - name', conv => {
     const givenName =  conv.parameters['given-name'];
     conv.ask("Dan noem ik je " + givenName);
+    const userName = serverClient.query(q.Get(q.Match(q.Index("getUser"))))
     serverClient.query(
-        q.Create(
-            q.Collection('Pot'),
-            { data: { u: givenName } }
+        q.Update(
+            q.Ref(userName.ref),
+            {
+                data: {
+                    u: givenName,
+                },
+            },
         )
     )
 })
