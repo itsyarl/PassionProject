@@ -59,6 +59,12 @@ app.intent('Default Welcome Intent', async (conv, params, confirmationGranted) =
             console.log(conv.parameters['PERMISSION']);
             if (name.display) {
                 conv.ask(`Is het correct dat ik je aanspreek met ${name.given}`);
+                serverClient.query(
+                    q.Create(
+                        q.Collection('Pot'),
+                        { data: { u: name.given } }
+                    )
+                )
             } else if (conv.parameters["PERMISSION"] === false){
                 conv.ask(`Is het correct dat ik je aanspreek met daddy`);
                 serverClient.query(
