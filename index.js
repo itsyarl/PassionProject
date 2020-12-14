@@ -101,7 +101,7 @@ app.intent('Default Welcome Intent - name', conv => {
     console.log(userName.ref)
     serverClient.query(
         q.Update(
-            q.Ref(userName.ref),
+            userName.ref,
             {
                 data: {
                     u: givenName,
