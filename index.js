@@ -97,7 +97,7 @@ app.intent('Default Welcome Intent - no', conv => {
 app.intent('Default Welcome Intent - name', conv => {
     const givenName =  conv.parameters['given-name'];
     conv.ask("Dan noem ik je " + givenName);
-    const userName = serverClient.query(q.Get(q.Match(q.Index("getUser"))));
+    const userName = await serverClient.query(q.Get(q.Match(q.Index("getUser"))));
     console.log(userName.ref)
     serverClient.query(
         q.Update(
